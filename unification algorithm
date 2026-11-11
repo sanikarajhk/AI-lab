@@ -1,0 +1,92 @@
+
+# Unification Algorithm in First Order Logic
+
+def is_variable(x):
+    return isinstance(x, str) and x.islower()
+
+
+# Apply substitution
+def substitute(x, subs):
+
+    while isinstance(x, str) and x in subs:
+        x = subs[x]
+
+    if isinstance(x, list):
+        return [substitute(i, subs) for i in x]
+
+    return x
+
+
+# Unification function
+def unify(x, y, subs=None):
+
+    if subs is None:
+        subs = {}
+
+    x = substitute(x, subs)
+    y = substitute(y, subs)
+
+    # Case 1: Both are equal
+    if x == y:
+        return subs
+
+    # Case 2: x is a variable
+    if is_variable(x):
+        if occurs(x, y):
+            return None
+        subs[x] = y
+        return subs
+
+    # Case 3: y is a variable
+    if is_variable(y):
+        if occurs(y, x):
+            return None
+        subs[y] = x
+        return subs
+
+    # Case 4: Both are lists
+    if isinstance(x, list) and isinstance(y, list):
+
+        if len(x) != len(y):
+            return None
+
+        for a, b in zip(x, y):
+            subs = unify(a, b, subs)
+
+            if subs is None:
+                return None
+
+        return subs
+
+    # Case 5: Cannot unify
+    return None
+
+
+# Check occurrence of variable
+def occurs(var, term):
+    if var == term:
+        return True
+
+    if isinstance(term, list):
+        return any(occurs(var, item) for item in term)
+
+    return False
+
+
+# Input predicates
+p1 = ["Knows", "John", "x"]
+p2 = ["Knows", "y", "Mary"]
+
+print("First Predicate:", p1)
+print("Second Predicate:", p2)
+
+# Perform unification
+result = unify(p1, p2)
+
+# Display output
+if result is not None:
+    print("\nUnification Successful!")
+    print("Substitution:", result)
+    print("Unified Expression:", substitute(p1, result))
+else:
+    print("\nUnification Failed!")
