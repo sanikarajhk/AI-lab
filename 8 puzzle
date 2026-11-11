@@ -1,0 +1,141 @@
+
+# 8 Puzzle Problem using Iterative Deepening Search (IDS)
+
+# 0 represents the blank space
+
+# Initial State
+start = [
+    [1, 2, 3],
+    [4, 0, 6],
+    [7, 5, 8]
+]
+
+# Goal State
+goal = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 0]
+]
+
+# Convert 2D list into tuple for comparison
+def convert(state):
+    return tuple(tuple(row) for row in state)
+
+
+# Check whether current state is goal
+def is_goal(state):
+    return state == goal
+
+
+# Find possible movements of blank space
+def get_neighbors(state):
+
+    neighbors = []
+
+    for i in range(3):
+        for j in range(3):
+
+            if state[i][j] == 0:
+                x, y = i, j
+
+    moves = [
+        (-1, 0, "Up"),
+        (1, 0, "Down"),
+        (0, -1, "Left"),
+        (0, 1, "Right")
+    ]
+
+    for dx, dy, move in moves:
+
+        nx = x + dx
+        ny = y + dy
+
+        if 0 <= nx < 3 and 0 <= ny < 3:
+
+            new_state = [row[:] for row in state]
+
+            # Swap blank with adjacent tile
+            new_state[x][y], new_state[nx][ny] = (
+                new_state[nx][ny],
+                new_state[x][y]
+            )
+
+            neighbors.append((new_state, move))
+
+    return neighbors
+
+
+# Depth Limited Search
+def DLS(state, depth, path, visited):
+
+    if is_goal(state):
+        return path
+
+    if depth == 0:
+        return None
+
+    visited.add(convert(state))
+
+    for new_state, move in get_neighbors(state):
+
+        key = convert(new_state)
+
+        if key not in visited:
+
+            result = DLS(
+                new_state,
+                depth - 1,
+                path + [(new_state, move)],
+                visited
+            )
+
+            if result is not None:
+                return result
+
+    return None
+
+
+# Iterative Deepening Search
+def IDS(start, max_depth=30):
+
+    for depth in range(max_depth + 1):
+
+        print("Searching at depth:", depth)
+
+        visited = set()
+
+        result = DLS(
+            start,
+            depth,
+            [(start, "Start")],
+            visited
+        )
+
+        if result is not None:
+            return result
+
+    return None
+
+
+# Display the solution
+def display_solution(solution):
+
+    if solution is None:
+        print("No solution found!")
+        return
+
+    print("\nSolution Found!")
+    print("Total Moves:", len(solution) - 1)
+
+    for step, (state, move) in enumerate(solution):
+
+        print("\nStep", step, "-", move)
+
+        for row in state:
+            print(row)
+
+
+# Execute IDS
+solution = IDS(start)
+
+display_solution(solution)
