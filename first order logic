@@ -1,0 +1,91 @@
+
+# Forward Chaining Algorithm
+# Problem: Prove that Robert is a Criminal
+
+# Step 1: Initial facts (Knowledge Base)
+KB = {
+    ("American", "Robert"),
+    ("Enemy", "A", "America"),
+    ("Owns", "A", "T1"),
+    ("Missile", "T1")
+}
+
+# Step 2: Forward Chaining Algorithm
+def forward_chaining(KB):
+
+    while True:
+        new_facts = set()
+
+        # Rule 1: All missiles are weapons
+        for fact in KB:
+            if fact[0] == "Missile":
+                x = fact[1]
+                new_facts.add(("Weapon", x))
+
+        # Rule 2: Enemies of America are hostile
+        for fact in KB:
+            if fact[0] == "Enemy" and fact[2] == "America":
+                x = fact[1]
+                new_facts.add(("Hostile", x))
+
+        # Rule 3: Robert sells missiles owned by Country A to A
+        for missile in KB:
+            if missile[0] == "Missile":
+                x = missile[1]
+
+                if ("Owns", "A", x) in KB:
+                    new_facts.add(("Sells", "Robert", x, "A"))
+
+        # Rule 4: An American selling weapons to a
+        # hostile country is a criminal
+        for fact in KB:
+            if fact[0] == "American":
+                p = fact[1]
+
+                for weapon in KB:
+                    if weapon[0] == "Weapon":
+                        q = weapon[1]
+
+                        for sale in KB:
+                            if sale[0] == "Sells":
+                                seller = sale[1]
+                                item = sale[2]
+                                country = sale[3]
+
+                                if seller == p and item == q:
+                                    if ("Hostile", country) in KB:
+                                        new_facts.add(
+                                            ("Criminal", p)
+                                        )
+
+        # Step 3: Check whether the goal is proved
+        if ("Criminal", "Robert") in KB:
+            print("\nGoal proved!")
+            print("Robert is a Criminal.")
+            return True
+
+        # Step 4: Stop if no new facts are generated
+        new_facts = new_facts - KB
+
+        if not new_facts:
+            print("\nGoal cannot be proved.")
+            return False
+
+        # Step 5: Add new facts to Knowledge Base
+        print("\nNew facts generated:")
+        for fact in new_facts:
+            print(fact)
+
+        KB.update(new_facts)
+
+
+# Step 6: Execute the algorithm
+print("Initial Knowledge Base:")
+for fact in sorted(KB):
+    print(fact)
+
+print("\nStarting Forward Chaining...")
+
+result = forward_chaining(KB)
+
+print("\nFinal Result:", result)
