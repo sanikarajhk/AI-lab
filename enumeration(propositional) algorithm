@@ -1,0 +1,64 @@
+
+from itertools import product
+
+# Step 1: Define propositional symbols
+symbols = ['P', 'Q', 'R']
+
+# Step 2: Define Knowledge Base
+# KB = (P => Q) AND (Q => R)
+
+def KB(model):
+    P = model['P']
+    Q = model['Q']
+    R = model['R']
+
+    return (not P or Q) and (not Q or R)
+
+
+# Step 3: Define Query
+def query(model):
+    return model['R']
+
+
+# Step 4: Print Truth Table
+print("P\tQ\tR\tKB\tQuery")
+
+print("-" * 40)
+
+models = 0
+valid = 0
+entails = True
+
+for values in product([True, False], repeat=3):
+
+    model = dict(zip(symbols, values))
+
+    p = model['P']
+    q = model['Q']
+    r = model['R']
+
+    kb_result = KB(model)
+    query_result = query(model)
+
+    models += 1
+
+    if kb_result:
+        valid += 1
+
+        if not query_result:
+            entails = False
+
+    print(
+        f"{p}\t{q}\t{r}\t{kb_result}\t{query_result}"
+    )
+
+
+# Step 5: Display Result
+print("-" * 40)
+print("Total Models:", models)
+print("Models satisfying KB:", valid)
+
+if entails:
+    print("KB entails Query: TRUE")
+else:
+    print("KB entails Query: FALSE")
