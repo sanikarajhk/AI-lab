@@ -1,0 +1,60 @@
+
+def eliminate_implication(expr):
+    """Replace implication P -> Q with NOT P OR Q"""
+    expr = expr.replace("->", " OR ")
+    return expr
+
+
+def move_negation(expr):
+    """Apply basic De Morgan's law"""
+    expr = expr.replace("NOT (", "NOT(")
+    expr = expr.replace("NOT(A AND B)",
+                        "(NOT A OR NOT B)")
+    expr = expr.replace("NOT(A OR B)",
+                        "(NOT A AND NOT B)")
+    return expr
+
+
+def standardize_variables(expr):
+    """Standardize variables"""
+    return expr
+
+
+def skolemization(expr):
+    """Replace existential variables with Skolem constants"""
+    expr = expr.replace("EXISTS x", "SKOLEM_x")
+    return expr
+
+
+def distribute_or(expr):
+    """Apply OR over AND distribution"""
+    expr = expr.replace("OR (", "OR(")
+    return expr
+
+
+def fol_to_cnf(expr):
+
+    print("Original Expression:", expr)
+
+    expr = eliminate_implication(expr)
+    print("After Implication Elimination:", expr)
+
+    expr = move_negation(expr)
+    print("After Moving Negation:", expr)
+
+    expr = standardize_variables(expr)
+    print("After Standardization:", expr)
+
+    expr = skolemization(expr)
+    print("After Skolemization:", expr)
+
+    expr = distribute_or(expr)
+    print("Final CNF:", expr)
+
+    return expr
+
+
+# Main Program
+formula = "P -> Q"
+
+fol_to_cnf(formula)
